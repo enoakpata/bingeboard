@@ -40,9 +40,15 @@ for page in range(1, 151):
     # Add every show ID on this page to our list
     ids.extend([show["id"] for show in data["results"]])  
     print(f"Page {page} done, {len(ids)} IDs so far")  # progress, so you know it's not frozen
+    
+#grab extra reality shows (Reality's TMDB genre ID is 10764)
+for page in range(1, 11):    # 10 pages × 20 = up to 200 reality shows
+    data = get("/discover/tv", with_genres=10764, sort_by="vote_count.desc", page=page)
+    ids.extend(show["id"] for show in data["results"])
 
 # Check for duplicates: a list keeps repeats, a set doesn't
 print(len(ids), len(set(ids)))
 
+ids = list(dict.fromkeys(ids))   # remove duplicates but keep the original order
 # Save to a CSV file in your data folder
-pd.DataFrame({"id": ids}).to_csv("data/show_ids.csv", index=False)  
+pd.DataFrame({"id": ids}).to_csv("data/show_ids.csv", index=False)   
